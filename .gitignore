@@ -1,0 +1,13 @@
+## 构建输出
+bin/
+obj/
+
+## Visual Studio
+*.user
+*.suo
+.vs/
+
+## IDE
+.idea/
+*.swp
+*.swo
