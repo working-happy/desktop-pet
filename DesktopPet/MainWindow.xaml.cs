@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
@@ -10,15 +11,7 @@ namespace DesktopPet;
 
 public partial class MainWindow : Window
 {
-    private enum State { Idle, Happy, Sleep }
-    private State _state = State.Idle;
     private readonly Random _rnd = new();
-    private int _idleSec = 0;
-
-    private readonly Border _body;
-    private readonly Ellipse _lEye, _rEye;
-    private readonly Path _mouth;
-    private readonly TextBlock _zzz;
     private readonly Border _bubble;
     private readonly TextBlock _bubbleText;
 
@@ -33,27 +26,20 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        _body = (Border)FindName("Body")!;
-        _lEye = (Ellipse)FindName("LEye")!;
-        _rEye = (Ellipse)FindName("REye")!;
-        _mouth = (Path)FindName("Mouth")!;
-        _zzz = (TextBlock)FindName("Zzz")!;
         _bubble = (Border)FindName("Bubble")!;
         _bubbleText = (TextBlock)FindName("BubbleText")!;
-
-        _body.RenderTransform = new TranslateTransform();
 
         // 30秒空闲检测
         _idleTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _idleTimer.Tick += (_, _) =>
         {
-            if (++_idleSec >= 30 && _state != State.Sleep) GoSleep();
+            GoSleep();
         };
         _idleTimer.Start();
 
         // 每8秒随机动作
         _actionTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(8) };
-        _actionTimer.Tick += (_, _) => { if (_state != State.Sleep) RandomAction(); };
+        _actionTimer.Tick += (_, _) => { RandomAction(); };
         _actionTimer.Start();
 
         Loaded += (_, _) =>
@@ -67,23 +53,15 @@ public partial class MainWindow : Window
         ShowBubble("你好呀~");
     }
 
-    private void Reset() => _idleSec = 0;
-
     private void Pet_Drag(object s, MouseButtonEventArgs e)
     {
-        // 忽略关闭按钮
-        var src = e.OriginalSource;
-        if (src is Button || (src as FrameworkElement)?.Name == "CloseBtn") return;
         DragMove();
     }
 
-    // 点击宠物身体触发互动
     private void Body_Click(object s, MouseButtonEventArgs e)
     {
-        if (_state == State.Sleep) { WakeUp(); return; }
-        SetHappy();
         ShowBubble(_happyMsg[_rnd.Next(_happyMsg.Length)]);
-        Reset();
+        SetHappy();
     }
 
     private void Close_Click(object sender, RoutedEventArgs e)
@@ -93,86 +71,74 @@ public partial class MainWindow : Window
 
     private void SetHappy()
     {
-        _state = State.Happy;
-        _lEye.Width = 12; _lEye.Height = 6;
-        _rEye.Width = 12; _rEye.Height = 6;
-
+        // 简单的缩放弹跳效果
         var sb = new Storyboard();
-        var a1 = new DoubleAnimation { To = -15, Duration = TimeSpan.FromMilliseconds(200) };
-        Storyboard.SetTarget(a1, _body);
-        Storyboard.SetTargetProperty(a1, new("(UIElement.RenderTransform).(TranslateTransform.Y)"));
+        var a1 = new DoubleAnimation { To = 0.9, Duration = TimeSpan.FromMilliseconds(150) };
+        Storyboard.SetTarget(a1, PetImage);
+        Storyboard.SetTargetProperty(a1, new("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
         sb.Children.Add(a1);
-        var a2 = new DoubleAnimation { To = 0, Duration = TimeSpan.FromMilliseconds(200), BeginTime = TimeSpan.FromMilliseconds(200) };
-        Storyboard.SetTarget(a2, _body);
-        Storyboard.SetTargetProperty(a2, new("(UIElement.RenderTransform).(TranslateTransform.Y)"));
+        var a2 = new DoubleAnimation { To = 0.9, Duration = TimeSpan.FromMilliseconds(150) };
+        Storyboard.SetTarget(a2, PetImage);
+        Storyboard.SetTargetProperty(a2, new("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
         sb.Children.Add(a2);
-        sb.Completed += (_, _) =>
-        {
-            _lEye.Width = 10; _lEye.Height = 10;
-            _rEye.Width = 10; _rEye.Height = 10;
-            _state = State.Idle;
-        };
+        var a3 = new DoubleAnimation { To = 1.1, Duration = TimeSpan.FromMilliseconds(150), BeginTime = TimeSpan.FromMilliseconds(150) };
+        Storyboard.SetTarget(a3, PetImage);
+        Storyboard.SetTargetProperty(a3, new("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+        sb.Children.Add(a3);
+        var a4 = new DoubleAnimation { To = 1.1, Duration = TimeSpan.FromMilliseconds(150), BeginTime = TimeSpan.FromMilliseconds(150) };
+        Storyboard.SetTarget(a4, PetImage);
+        Storyboard.SetTargetProperty(a4, new("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+        sb.Children.Add(a4);
+        var a5 = new DoubleAnimation { To = 1.0, Duration = TimeSpan.FromMilliseconds(150), BeginTime = TimeSpan.FromMilliseconds(300) };
+        Storyboard.SetTarget(a5, PetImage);
+        Storyboard.SetTargetProperty(a5, new("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+        sb.Children.Add(a5);
+        var a6 = new DoubleAnimation { To = 1.0, Duration = TimeSpan.FromMilliseconds(150), BeginTime = TimeSpan.FromMilliseconds(300) };
+        Storyboard.SetTarget(a6, PetImage);
+        Storyboard.SetTargetProperty(a6, new("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+        sb.Children.Add(a6);
         sb.Begin();
     }
 
     private void GoSleep()
     {
-        _state = State.Sleep;
-        _lEye.Height = 2; _rEye.Height = 2;
-        _mouth.Data = Geometry.Parse("M -4,18 L 4,18");
-        _zzz.Visibility = Visibility.Visible;
-        _body.RenderTransformOrigin = new(0.5, 0.5);
-        _body.RenderTransform = new RotateTransform(90);
         ShowBubble(_sleepMsg[_rnd.Next(_sleepMsg.Length)]);
-    }
-
-    private void WakeUp()
-    {
-        _state = State.Idle;
-        _lEye.Width = 10; _lEye.Height = 10;
-        _rEye.Width = 10; _rEye.Height = 10;
-        _mouth.Data = Geometry.Parse("M -4,16 Q 0,22 4,16");
-        _zzz.Visibility = Visibility.Collapsed;
-        _body.RenderTransform = new TranslateTransform();
-        ShowBubble("醒了！");
-        Reset();
     }
 
     private void RandomAction()
     {
-        Reset();
         switch (_rnd.Next(3))
         {
             case 0: // 弹跳
-                _body.RenderTransform = new TranslateTransform();
+                PetImage.RenderTransform = new TranslateTransform();
                 var sb1 = new Storyboard();
                 var b1 = new DoubleAnimation { To = -15, Duration = TimeSpan.FromMilliseconds(300) };
-                Storyboard.SetTarget(b1, _body);
+                Storyboard.SetTarget(b1, PetImage);
                 Storyboard.SetTargetProperty(b1, new("(UIElement.RenderTransform).(TranslateTransform.Y)"));
                 sb1.Children.Add(b1);
                 var b2 = new DoubleAnimation { To = 0, Duration = TimeSpan.FromMilliseconds(300), BeginTime = TimeSpan.FromMilliseconds(300) };
-                Storyboard.SetTarget(b2, _body);
+                Storyboard.SetTarget(b2, PetImage);
                 Storyboard.SetTargetProperty(b2, new("(UIElement.RenderTransform).(TranslateTransform.Y)"));
                 sb1.Children.Add(b2);
-                sb1.Begin(_body);
+                sb1.Begin(PetImage);
                 break;
             case 1: ShowBubble(_idleMsg[_rnd.Next(_idleMsg.Length)]); break;
             case 2: // 摇摆
-                _body.RenderTransform = new RotateTransform();
+                PetImage.RenderTransform = new RotateTransform();
                 var sb2 = new Storyboard();
                 var s1 = new DoubleAnimation { To = -10, Duration = TimeSpan.FromMilliseconds(200) };
-                Storyboard.SetTarget(s1, _body);
+                Storyboard.SetTarget(s1, PetImage);
                 Storyboard.SetTargetProperty(s1, new("(UIElement.RenderTransform).(RotateTransform.Angle)"));
                 sb2.Children.Add(s1);
                 var s2 = new DoubleAnimation { To = 10, Duration = TimeSpan.FromMilliseconds(200), BeginTime = TimeSpan.FromMilliseconds(200) };
-                Storyboard.SetTarget(s2, _body);
+                Storyboard.SetTarget(s2, PetImage);
                 Storyboard.SetTargetProperty(s2, new("(UIElement.RenderTransform).(RotateTransform.Angle)"));
                 sb2.Children.Add(s2);
                 var s3 = new DoubleAnimation { To = 0, Duration = TimeSpan.FromMilliseconds(200), BeginTime = TimeSpan.FromMilliseconds(400) };
-                Storyboard.SetTarget(s3, _body);
+                Storyboard.SetTarget(s3, PetImage);
                 Storyboard.SetTargetProperty(s3, new("(UIElement.RenderTransform).(RotateTransform.Angle)"));
                 sb2.Children.Add(s3);
-                sb2.Begin(_body);
+                sb2.Begin(PetImage);
                 break;
         }
     }
@@ -193,7 +159,6 @@ public partial class MainWindow : Window
         timer.Tick += (_, _) =>
         {
             timer.Stop();
-            timer.Dispose();
             var fo = new DoubleAnimation { To = 0, Duration = TimeSpan.FromMilliseconds(300) };
             fo.Completed += (_, _) => _bubble.Visibility = Visibility.Collapsed;
             Storyboard.SetTarget(fo, _bubble);

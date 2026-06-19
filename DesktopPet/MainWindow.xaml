@@ -33,91 +33,20 @@
             </Button.Template>
         </Button>
 
-        <!-- 宠物主体（可拖拽区域） -->
-        <Grid x:Name="PetBody" Margin="10" MouseLeftButtonDown="Pet_Drag">
-            <!-- 身体 -->
-            <Border x:Name="Body" Width="80" Height="70"
-                    HorizontalAlignment="Center" VerticalAlignment="Center"
-                    Background="#F5DEB3" CornerRadius="30,30,25,25"
-                    MouseLeftButtonDown="Body_Click">
-                <Border.Effect><DropShadowEffect BlurRadius="8" ShadowDepth="0" Opacity="0.15" /></Border.Effect>
-                <Grid>
-                    <!-- 耳朵 -->
-                    <Border Width="14" Height="20" Background="#D2B48C" CornerRadius="7"
-                            HorizontalAlignment="Left" VerticalAlignment="Top" Margin="2,-14,0,0"
-                            RenderTransformOrigin="0.5,0.5">
-                        <Border.RenderTransform><RotateTransform Angle="-15"/></Border.RenderTransform>
-                    </Border>
-                    <Border Width="14" Height="20" Background="#D2B48C" CornerRadius="7"
-                            HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-14,2,0"
-                            RenderTransformOrigin="0.5,0.5">
-                        <Border.RenderTransform><RotateTransform Angle="15"/></Border.RenderTransform>
-                    </Border>
+        <!-- 宠物 GIF -->
+        <Image x:Name="PetImage"
+               Source="pack:application:///DesktopPet;component/assets/hello.gif"
+               Stretch="None"
+               Margin="10"
+               MouseLeftButtonDown="Body_Click"
+               MouseLeftButtonUp="Pet_Drag"/>
 
-                    <!-- 眼睛 -->
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                Margin="0,-14,0,0">
-                        <Ellipse x:Name="LEye" Width="10" Height="10" Fill="#333"
-                                 RenderTransformOrigin="0.5,0.5">
-                            <Ellipse.RenderTransform><TranslateTransform X="-8"/></Ellipse.RenderTransform>
-                        </Ellipse>
-                        <Ellipse x:Name="REye" Width="10" Height="10" Fill="#333"
-                                 RenderTransformOrigin="0.5,0.5">
-                            <Ellipse.RenderTransform><TranslateTransform X="8"/></Ellipse.RenderTransform>
-                        </Ellipse>
-                    </StackPanel>
-
-                    <!-- 嘴巴 -->
-                    <Path x:Name="Mouth" Data="M -4,16 Q 0,22 4,16"
-                          Stroke="#333" StrokeThickness="2" Fill="Transparent"
-                          HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,10,0,0"/>
-
-                    <!-- 腮红 -->
-                    <Ellipse Width="10" Height="6" Fill="#FFB6C1" Opacity="0.3"
-                             HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-22,6,0,0"/>
-                    <Ellipse Width="10" Height="6" Fill="#FFB6C1" Opacity="0.3"
-                             HorizontalAlignment="Center" VerticalAlignment="Center" Margin="12,6,0,0"/>
-                </Grid>
-            </Border>
-
-            <!-- 脚 -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
-                        VerticalAlignment="Bottom" Margin="0,0,0,-8">
-                <Ellipse Width="14" Height="8" Fill="#D2B48C" Margin="0,0,4,0"/>
-                <Ellipse Width="14" Height="8" Fill="#D2B48C" Margin="4,0,0,0"/>
-            </StackPanel>
-
-            <!-- 阴影 -->
-            <Ellipse Width="50" Height="8" Fill="#000" Opacity="0.1"
-                     HorizontalAlignment="Center" VerticalAlignment="Bottom"
-                     Margin="0,-12,0,0">
-                <Ellipse.Effect><BlurEffect Radius="3"/></Ellipse.Effect>
-            </Ellipse>
-
-            <!-- Zzz -->
-            <TextBlock x:Name="Zzz" Text="Zzz..." FontSize="14" Foreground="#888"
-                       HorizontalAlignment="Right" VerticalAlignment="Top" Margin="30,-30,0,0"
-                       Visibility="Collapsed">
-                <TextBlock.Triggers>
-                    <EventTrigger RoutedEvent="TextBlock.Loaded">
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
-                                                 From="0" To="-25" Duration="0:0:2" RepeatBehavior="Forever"/>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </EventTrigger>
-                </TextBlock.Triggers>
-                <TextBlock.RenderTransform><TranslateTransform/></TextBlock.RenderTransform>
-            </TextBlock>
-
-            <!-- 气泡 -->
-            <Border x:Name="Bubble" Background="White" CornerRadius="12" Padding="8,5"
-                    HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-50,0,0"
-                    Visibility="Collapsed">
-                <Border.Effect><DropShadowEffect BlurRadius="6" ShadowDepth="1" Opacity="0.2"/></Border.Effect>
-                <TextBlock x:Name="BubbleText" FontSize="11" Foreground="#333" TextAlignment="Center"/>
-            </Border>
-        </Grid>
+        <!-- 气泡 -->
+        <Border x:Name="Bubble" Background="White" CornerRadius="12" Padding="8,5"
+                HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-50,0,0"
+                Visibility="Collapsed">
+            <Border.Effect><DropShadowEffect BlurRadius="6" ShadowDepth="1" Opacity="0.2"/></Border.Effect>
+            <TextBlock x:Name="BubbleText" FontSize="11" Foreground="#333" TextAlignment="Center"/>
+        </Border>
     </Grid>
 </Window>
